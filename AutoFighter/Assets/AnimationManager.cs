@@ -165,6 +165,9 @@ public class AnimationManager : MonoBehaviour {
             case "cast":
                 Animator.SetTrigger("Cast1");
                 break;
+            case "defend":
+                Animator.SetTrigger("Defend");
+                break;
         }
     }
 

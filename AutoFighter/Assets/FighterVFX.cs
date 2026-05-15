@@ -7,6 +7,7 @@ public class FighterVFX : MonoBehaviour {
     public Vector3 effectOriginOffset;
 
     public List<GameObject> HitVFXPrefabs = new List<GameObject>();
+    public GameObject BlockEffectPrefab;
 
     [Header("Pooling")]
     public int PoolSizePerPrefab = 5;
@@ -52,6 +53,10 @@ public class FighterVFX : MonoBehaviour {
                 GetEffectLifetime(effect)
             )
         );
+    }
+
+    public void PlayBlockEffect() {
+        Instantiate(BlockEffectPrefab, transform.position + effectOriginOffset, Quaternion.identity); 
     }
 
     #region Pooling

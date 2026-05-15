@@ -32,6 +32,7 @@ public class FighterEntity : MonoBehaviour {
     public StatValue Damage;
     public StatValue AttackSpeed;
     public StatValue MoveSpeed;
+    public StatValue ParryChance;
 
     #endregion
 
@@ -73,8 +74,9 @@ public class FighterEntity : MonoBehaviour {
 
         HandleRegeneration();
         HandleEffects();
+
         // Keep looking at him all the time just to be sure
-        _movement.LookAt(Enemy.transform.position);
+        if(CurrentDecision != FighterDecision.RunAway) _movement.LookAt(Enemy.transform.position);
     }
 
     void SyncStats() {
@@ -133,7 +135,13 @@ public class FighterEntity : MonoBehaviour {
             MoveSpeed.CurrentValue
         );
 
-        _movement.LookAt(Enemy.transform.position);
+        
+        // Look away
+        // Get the direction to the enemy
+        Vector3 dirToEnemy = Enemy.transform.position - transform.position;
+
+        // Look at the point reached by moving backwards from your current position
+        _movement.LookAt(transform.position - dirToEnemy);
     }
 
     public float BasicAttack() {
@@ -194,6 +202,26 @@ public class FighterEntity : MonoBehaviour {
         return duration;
     }
 
+    public float Defend() {
+
+        if (IsBusy)
+            return 0f;
+
+        IsBusy = true;
+
+        CurrentDecision = FighterDecision.Defend;
+
+        _movement.StopMovement();
+
+        GetComponent<AnimationManager>().FireTrigger("defend"); // ew
+
+        float duration = 1f; // Defend for one second
+
+        StartCoroutine(BusyRoutine(duration));
+
+        return duration;
+    }
+
     public void Wait() {
 
         _movement.StopMovement();
@@ -207,6 +235,17 @@ public class FighterEntity : MonoBehaviour {
 
         if (IsDead)
             return;
+
+        if(CurrentDecision == FighterDecision.Defend) {
+            // Try parrying... maybe later
+            if(UnityEngine.Random.value < ParryChance.CurrentValue) {
+                // TODO AFTER REFACTOR
+            }
+
+            _vfx.PlayBlockEffect();
+
+            return;
+        }
 
         HP.Decrease(damage);
 

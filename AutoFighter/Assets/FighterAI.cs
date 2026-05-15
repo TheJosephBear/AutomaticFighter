@@ -19,6 +19,9 @@ public class FighterAI : MonoBehaviour {
     [Range(0, 1)]
     public float SpecialCastChance = 0.7f;
 
+    [Range(0, 1)]
+    public float DefendChance = 0.3f;
+
     [Header("Reconsideration")]
     [Tooltip("How often AI reconsiders while moving.")]
     public float ReconsiderInterval = 0.5f;
@@ -122,7 +125,6 @@ public class FighterAI : MonoBehaviour {
 
         // Enrage override
         if (enraged) {
-
             // no waiting / circling / hesitation
             // only fight or chase
 
@@ -209,14 +211,23 @@ public class FighterAI : MonoBehaviour {
         // =========================
 
         if (distance <= FightingDistance) {
+            if(Random.value < DefendChance) {
+                float duration =
+                _entity.Defend();
 
-            float duration =
+                LockDecision(
+                    FighterDecision.Defend,
+                    duration
+                );
+            } else {
+                float duration =
                 _entity.BasicAttack();
 
-            LockDecision(
-                FighterDecision.BasicAttacking,
-                duration
-            );
+                LockDecision(
+                    FighterDecision.BasicAttacking,
+                    duration
+                );
+            }
 
             return;
         }
