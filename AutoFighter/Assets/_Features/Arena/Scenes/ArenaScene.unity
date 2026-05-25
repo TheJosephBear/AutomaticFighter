@@ -1760,11 +1760,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
       propertyPath: PurpleGuyDamage
-      value: 2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
+      propertyPath: KnockbackStrength
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
       propertyPath: PurpleGuyLifeTime
-      value: 10
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
       propertyPath: EntitySpawnOffset.y
@@ -1776,7 +1780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
       propertyPath: PurpleGuyAttackSpeed
-      value: 0.1
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 694765467018321000, guid: 93ae91fa9fc1d674583013cb1af4d6c9, type: 3}
       propertyPath: PurpleGuyMovementSpeed

@@ -409,6 +409,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2697397450116628616, guid: fa044534287590848b27976d3873bd19, type: 3}
+      propertyPath: PurpleGuyAttackSpeed
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2697397450116628616, guid: fa044534287590848b27976d3873bd19, type: 3}
+      propertyPath: PurpleGuyMovementSpeed
+      value: 15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa044534287590848b27976d3873bd19, type: 3}
 --- !u!4 &694765467018320999 stripped

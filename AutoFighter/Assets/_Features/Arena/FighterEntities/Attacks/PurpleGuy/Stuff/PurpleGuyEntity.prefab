@@ -384,7 +384,7 @@ MonoBehaviour:
     _permanentMultiplier: 1
     _temporaryMultiplier: 1
   AttackSpeed:
-    _baseValue: 0.1
+    _baseValue: 0.8
     _currentValue: 0.2
     _permanentMultiplier: 1
     _temporaryMultiplier: 1
@@ -508,6 +508,10 @@ PrefabInstance:
     - target: {fileID: 1363559702030575732, guid: 5784ccc8f23d8a24ba0aecb7bb578c4d, type: 3}
       propertyPath: BoxSize.z
       value: 18.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 1363559702030575732, guid: 5784ccc8f23d8a24ba0aecb7bb578c4d, type: 3}
+      propertyPath: KnockbackStrength
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1363559702030575733, guid: 5784ccc8f23d8a24ba0aecb7bb578c4d, type: 3}
       propertyPath: m_RootOrder

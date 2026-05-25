@@ -47,7 +47,7 @@ MonoBehaviour:
   BaseDamage: 10
   KnockbackStrength: 5
   AttackDuration: 0.1
-  PurpleGuyLifeTime: 10
+  PurpleGuyLifeTime: 5
   PurpleGuyDamage: 1
   PurpleGuyAttackSpeed: 0.2
   PurpleGuyMovementSpeed: 30
