@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +31,10 @@ public class CharacterManager : MonoBehaviour {
         });
     }
 
+    public void AddCharacter(Character character) {
+        CharacterList.Add(character);
+    }
+
     public void EditCharacter(
         int index,
         float HP,
@@ -53,6 +58,10 @@ public class CharacterManager : MonoBehaviour {
         SelectedCharacter2 = CharacterList[index];
     }
 
+    public void DeleteCharacter(Character character) {
+        CharacterList.Remove(character);
+    }
+
 }
 
 public class Character {
@@ -69,8 +78,10 @@ public enum CharacterModel {
     Freddy
 }
 
+[Serializable]
 public class CharacterModelPairing {
     public string Name;
+    public string Description;
     public CharacterModel CharacterModelEnum;
     public GameObject CharacterEntityPrefab;
 }
