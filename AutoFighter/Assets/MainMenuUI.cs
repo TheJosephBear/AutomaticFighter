@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour {
+
+    public string MainMenuSceneName = "";
+    public string ArenaSceneName = "";
 
     public GameObject MainView;
     public GameObject PlayerView;
     public GameObject FighterView;
     public LeaderboardUI LeaderBoardRef;
 
-    PlayerManager _playerManager;
     ObjectUIPreviewManager _previewManager;
-    CharacterManager _characterManager;
 
     void Awake() {
-        _playerManager = FindAnyObjectByType<PlayerManager>();
         _previewManager = FindAnyObjectByType<ObjectUIPreviewManager>();
-        _characterManager = FindAnyObjectByType<CharacterManager>();
         //    CloseCharacterEditing();
 
         //     StartCoroutine(WaitForInitalization());
@@ -27,7 +27,10 @@ public class MainMenuUI : MonoBehaviour {
     }
 
     public void StartFight() {
+        if (CharacterManager.Instance.SelectedCharacter1 == null && CharacterManager.Instance.SelectedCharacter2 == null) return;
 
+        SceneManager.LoadScene(ArenaSceneName);
+        SceneManager.UnloadScene(MainMenuSceneName);
     }
 
     public void OpenMainMenu() {
@@ -35,6 +38,7 @@ public class MainMenuUI : MonoBehaviour {
         PlayerView.SetActive(false);
         FighterView.SetActive(false);
         UpdateLeaderboard();
+        GetComponentInChildren<BettingUI>().UpdateBettingView();
     }
 
     public void OpenFighterView() {
@@ -51,9 +55,9 @@ public class MainMenuUI : MonoBehaviour {
 
     void UpdateLeaderboard() {
         LeaderBoardRef.Clear();
-        if (_playerManager.PlayerList.Count < 1) return;
+        if (PlayerManager.Instance.PlayerList.Count < 1) return;
 
-        List<Player> sortedList = _playerManager.PlayerList.OrderBy(player => player.Points).ToList();
+        List<Player> sortedList = PlayerManager.Instance.PlayerList.OrderBy(player => player.Points).ToList();
         for (int i = 0; i < sortedList.Count; i++) {
             Player player = sortedList[i];
             LeaderBoardRef.AddItem(player.Name, i+1, player.Points);

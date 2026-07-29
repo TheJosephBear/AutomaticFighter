@@ -3,18 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterManager : MonoBehaviour {
-    
+public class CharacterManager : Singleton<CharacterManager> {
+
     public List<Character> CharacterList = new List<Character>();
     public List<CharacterModelPairing> CharacterPrefabList = new List<CharacterModelPairing>();
     [HideInInspector]
     public Character SelectedCharacter1;
     [HideInInspector]
     public Character SelectedCharacter2;
-
-    private void Awake() {
-        DontDestroyOnLoad(this);
-    }
 
     public void AddCharacter(
         float HP,

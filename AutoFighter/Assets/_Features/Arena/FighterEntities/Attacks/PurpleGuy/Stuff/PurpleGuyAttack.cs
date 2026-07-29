@@ -21,7 +21,8 @@ public class PurpleGuyAttack : FighterAttackBase {
 
     public override float ExecuteAttack() {
         // Play effect
-        Instantiate(VFXPrefab, transform.position + VFXSpawnOffset, Quaternion.identity);
+        Instantiate(VFXPrefab, transform.position + EntitySpawnOffset, Quaternion.identity);
+        Instantiate(VFXPrefab, transform.position, Quaternion.identity);
         // Spawn Willie
         _purpleEntityInstance = 
             Instantiate(PurpleGuyEntityPrefab, transform.position + EntitySpawnOffset, Quaternion.identity)

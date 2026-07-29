@@ -43,13 +43,20 @@ public class FighterEntity : MonoBehaviour {
     public bool IsDead { get; private set; }
     public bool IsBusy { get; private set; }
 
-    public Action<FighterEntity> OnDeath;
-
     #endregion
 
     #region Effects
 
     public List<ActiveEffect> Effects = new();
+
+    #endregion
+
+    #region Events
+
+    public event Action<float> OnHPChange;
+    public event Action OnHit;
+    public event Action<float> OnManaChange;
+    public event Action OnDeath;
 
     #endregion
 
@@ -83,6 +90,7 @@ public class FighterEntity : MonoBehaviour {
 
         HP.ForceSync();
         Mana.ForceSync();
+        Mana.CurrentValue = 0f;
 
         HPRegen.ForceSync();
         ManaRegen.ForceSync();
@@ -170,7 +178,6 @@ public class FighterEntity : MonoBehaviour {
         yield return new WaitForSeconds(wait);
         if (cast) {
             _attackManager.CastRandomAttack();
-
         } else {
             _attackManager.CastBasicAttack();
         }
@@ -196,6 +203,7 @@ public class FighterEntity : MonoBehaviour {
 
         _movement.StopMovement();
         Mana.CurrentValue = 0f;
+        OnManaChange.Invoke(Mana.CurrentValue);
 
         StartCoroutine(BusyRoutine(duration));
 
@@ -248,6 +256,8 @@ public class FighterEntity : MonoBehaviour {
         }
 
         HP.Decrease(damage);
+        OnHPChange.Invoke(HP.CurrentValue);
+        OnHit?.Invoke();
 
         _movement.ApplyKnockback(knockbackStrength);
 
@@ -276,7 +286,7 @@ public class FighterEntity : MonoBehaviour {
 
         _rb.isKinematic = true;
 
-        OnDeath?.Invoke(this);
+        OnDeath?.Invoke();
     }
 
     #endregion
@@ -345,10 +355,12 @@ public class FighterEntity : MonoBehaviour {
 
         if (HP.CurrentValue > 0f) {
             HP.Increase(HPRegen.CurrentValue * delta);
+            OnHPChange?.Invoke(HP.CurrentValue);
         }
 
         if (Mana.CurrentValue < Mana.GetMaxValue()) {
             Mana.Increase(ManaRegen.CurrentValue * delta);
+            OnManaChange?.Invoke(Mana.CurrentValue);
         }
     }
 

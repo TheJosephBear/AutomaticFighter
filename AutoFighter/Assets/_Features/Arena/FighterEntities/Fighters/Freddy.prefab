@@ -371,15 +371,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2697397450116628615, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.994779
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2697397450116628615, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.6698194
+      value: 2.444
       objectReference: {fileID: 0}
     - target: {fileID: 2697397450116628615, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -24.902157
+      value: 1.191
       objectReference: {fileID: 0}
     - target: {fileID: 2697397450116628615, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: m_LocalRotation.w
@@ -408,6 +408,14 @@ PrefabInstance:
     - target: {fileID: 2697397450116628615, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2697397450116628616, guid: fa044534287590848b27976d3873bd19, type: 3}
+      propertyPath: VFXSpawnOffset.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2697397450116628616, guid: fa044534287590848b27976d3873bd19, type: 3}
+      propertyPath: EntitySpawnOffset.y
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2697397450116628616, guid: fa044534287590848b27976d3873bd19, type: 3}
       propertyPath: PurpleGuyAttackSpeed

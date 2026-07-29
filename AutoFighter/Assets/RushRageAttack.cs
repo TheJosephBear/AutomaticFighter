@@ -17,10 +17,10 @@ public class RushRageAttack : FighterAttackBase {
 
     void Awake() {
         _entity = transform.root.GetComponent<FighterEntity>();
-        _enemy = _entity.Enemy;
     }
 
     public override float ExecuteAttack() {
+        _enemy = _entity.Enemy;
         // Activate rush (vfx + attack speed)
         StartCoroutine(AttackCoroutine());
         // Teleport to enemy

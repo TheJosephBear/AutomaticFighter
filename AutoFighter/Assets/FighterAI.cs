@@ -368,10 +368,6 @@ public class FighterAI : MonoBehaviour {
 
         _entity.SetDecision(decision);
 
-        // temporary debug
-        FindAnyObjectByType<HUDManager>()
-            ?.SetStatus1(decision.ToString());
-
         _timer = duration;
 
         _locked = true;

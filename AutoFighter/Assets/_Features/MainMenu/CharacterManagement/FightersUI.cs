@@ -25,14 +25,15 @@ public class FightersUI : MonoBehaviour {
     [HideInInspector]
     public Character ActivelyEditedCharacter;
 
-    CharacterManager _characterManager;
     ObjectUIPreviewManager _previewManager;
 
     void Awake() {
-        _characterManager = FindAnyObjectByType<CharacterManager>();
-        _previewManager = FindAnyObjectByType<ObjectUIPreviewManager>();
-
         CharacterEditingView.SetActive(false);
+    }
+
+    void Start() {
+        _previewManager = FindAnyObjectByType<ObjectUIPreviewManager>();
+        UpdateScrollView();
     }
 
     public void OnAddCharacter() {
@@ -45,7 +46,7 @@ public class FightersUI : MonoBehaviour {
             CharacterModel = CharacterModel.Knight,
         };
 
-        _characterManager.AddCharacter(newCharacter);
+        CharacterManager.Instance.AddCharacter(newCharacter);
         UpdateScrollView();
     }
 
@@ -59,7 +60,7 @@ public class FightersUI : MonoBehaviour {
     }
 
     public void OnRemoveCharacter() {
-        _characterManager.DeleteCharacter(ActivelyEditedCharacter);
+        CharacterManager.Instance.DeleteCharacter(ActivelyEditedCharacter);
         OnEditingFinished();
     }
 
@@ -78,14 +79,14 @@ public class FightersUI : MonoBehaviour {
 
         // Dropdown
         RefreshCharacterModelDropdown();
-        int targetIndex = _characterManager.CharacterPrefabList.FindIndex(ch => ch.CharacterModelEnum == character.CharacterModel);
+        int targetIndex = CharacterManager.Instance.CharacterPrefabList.FindIndex(ch => ch.CharacterModelEnum == character.CharacterModel);
         CharacterModelDropdown.value = targetIndex >= 0 ? targetIndex : 0;
         CharacterModelDropdown.RefreshShownValue();
     }
 
     void RefreshCharacterModelDropdown() {
         List<TMP_Dropdown.OptionData> newOptions = new List<TMP_Dropdown.OptionData>();
-        foreach (CharacterModelPairing ch in _characterManager.CharacterPrefabList) {
+        foreach (CharacterModelPairing ch in CharacterManager.Instance.CharacterPrefabList) {
             newOptions.Add(new TMP_Dropdown.OptionData(ch.Name));
         }
 
@@ -96,7 +97,7 @@ public class FightersUI : MonoBehaviour {
 
     void UpdateScrollView() {
         SafelyDestroyAllItems();
-        foreach (Character character in _characterManager.CharacterList) {
+        foreach (Character character in CharacterManager.Instance.CharacterList) {
             CharacterButton button = Instantiate(CharacterButtonPrefab, CharacterScrollViewContent.transform).GetComponent<CharacterButton>();
             button.Character = character;
             button.FightersUIReff = this;
@@ -139,7 +140,7 @@ public class FightersUI : MonoBehaviour {
     #region Editing OnClicks
 
     public void OnCharacterModelChanged(int index) {
-        ActivelyEditedCharacter.CharacterModel = _characterManager.CharacterPrefabList[index].CharacterModelEnum;
+        ActivelyEditedCharacter.CharacterModel = CharacterManager.Instance.CharacterPrefabList[index].CharacterModelEnum;
         FighterPreview.texture = _previewManager.GetObjectPreviewTexture(((int)ActivelyEditedCharacter.CharacterModel));
     }
 

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class BettingUI : MonoBehaviour {
 
-    // UI References
     public TMP_Dropdown CharacterSelect1Dropdown;
     public TMP_Dropdown CharacterSelect2Dropdown;
     public RawImage Fighter1Preview;
@@ -15,27 +14,21 @@ public class BettingUI : MonoBehaviour {
     public GameObject BettingPlayerPrefab;
     public GameObject BettingScrollViewContent;
 
-    // Internal trackers
-    private CharacterManager _characterManager;
-    private PlayerManager _playerManager;
-    private ObjectUIPreviewManager _previewManager;
+    ObjectUIPreviewManager _previewManager;
 
-    // Track what players have bet on (Player instance -> Choice/Bet amount mapping)
-    // You can track this in a custom runtime class or inside the Player object if preferred
-    private Dictionary<Player, int> playerBets = new Dictionary<Player, int>();
-    private Dictionary<Player, int> playerChoices = new Dictionary<Player, int>(); // 1 for Fighter1, 2 for Fighter2
+    private List<BettingPlayerItem> _activeItems = new List<BettingPlayerItem>();
 
-    void Awake() {
-        _characterManager = FindAnyObjectByType<CharacterManager>();
-        _playerManager = FindAnyObjectByType<PlayerManager>();
+    void Start() { 
+        StartCoroutine(InitCoroutine());
+    }
+
+    IEnumerator InitCoroutine() {
+        yield return new WaitForSeconds(0.2f);
+    }
+
+    public void UpdateBettingView() {
         _previewManager = FindAnyObjectByType<ObjectUIPreviewManager>();
-    }
 
-    void OnEnable() {
-        UpdateBettingView();
-    }
-
-    void UpdateBettingView() {
         InitializeDropdowns();
         UpdateBetterList();
     }
@@ -45,77 +38,60 @@ public class BettingUI : MonoBehaviour {
         CharacterSelect2Dropdown.ClearOptions();
 
         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        foreach (Character character in _characterManager.CharacterList) {
+        foreach (Character character in CharacterManager.Instance.CharacterList) {
             options.Add(new TMP_Dropdown.OptionData(character.Name));
         }
 
         CharacterSelect1Dropdown.AddOptions(options);
         CharacterSelect2Dropdown.AddOptions(options);
 
-        // Select defaults if they exist
-        if (_characterManager.CharacterList.Count > 0) {
+        if (CharacterManager.Instance.CharacterList.Count > 0) {
             OnCharacterSelected1(0);
-            if (_characterManager.CharacterList.Count > 1) {
-                CharacterSelect2Dropdown.value = 1;
-                OnCharacterSelected2(1);
-            } else {
-                OnCharacterSelected2(0);
-            }
+            int secondChoice = CharacterManager.Instance.CharacterList.Count > 1 ? 1 : 0;
+            CharacterSelect2Dropdown.value = secondChoice;
+            OnCharacterSelected2(secondChoice);
         }
     }
 
-    void UpdateBetterList() {
+    public void UpdateBetterList() {
         SafelyDestroyAllItems();
+        _activeItems.Clear();
 
-        foreach (Player player in _playerManager.PlayerList) {
+
+        foreach (Player player in PlayerManager.Instance.PlayerList) {
             BettingPlayerItem item = Instantiate(BettingPlayerPrefab, BettingScrollViewContent.transform)
                                      .GetComponent<BettingPlayerItem>();
             item.InitializeUI(player, this);
+            _activeItems.Add(item);
         }
+
+        RefreshFighterNamesOnItems();
     }
 
-    #region Betting OnClicks
-
     public void OnCharacterSelected1(int index) {
-        if (_characterManager.CharacterList.Count == 0) return;
-        _characterManager.SelectCharacter1(index);
-        Fighter1Preview.texture = _previewManager.GetObjectPreviewTexture((int)_characterManager.SelectedCharacter1.CharacterModel);
+        if (CharacterManager.Instance.CharacterList.Count == 0) return;
+        CharacterManager.Instance.SelectCharacter1(index);
+        Fighter1Preview.texture = _previewManager.GetObjectPreviewTexture((int)CharacterManager.Instance.SelectedCharacter1.CharacterModel);
+        RefreshFighterNamesOnItems();
+    //    UpdateBetterList();
     }
 
     public void OnCharacterSelected2(int index) {
-        if (_characterManager.CharacterList.Count == 0) return;
-        _characterManager.SelectCharacter2(index);
-        Fighter2Preview.texture = _previewManager.GetObjectPreviewTexture((int)_characterManager.SelectedCharacter2.CharacterModel);
+        if (CharacterManager.Instance.CharacterList.Count == 0) return;
+        CharacterManager.Instance.SelectCharacter2(index);
+        Fighter2Preview.texture = _previewManager.GetObjectPreviewTexture((int)CharacterManager.Instance.SelectedCharacter2.CharacterModel);
+        RefreshFighterNamesOnItems();
+    //    UpdateBetterList();
     }
 
-    public void BetOnFighter1(Player player, int amount) {
-        playerChoices[player] = 1;
-        playerBets[player] = amount;
-    }
+    private void RefreshFighterNamesOnItems() {
+        string f1Name = CharacterManager.Instance.SelectedCharacter1 != null ? CharacterManager.Instance.SelectedCharacter1.Name : "Fighter 1";
+        string f2Name = CharacterManager.Instance.SelectedCharacter2 != null ? CharacterManager.Instance.SelectedCharacter2.Name : "Fighter 2";
 
-    public void BetOnFighter2(Player player, int amount) {
-        playerChoices[player] = 2;
-        playerBets[player] = amount;
-    }
-
-    public void OnGAMBA(Player player, int finalizedBet) {
-        if (!playerChoices.ContainsKey(player)) {
-            Debug.LogWarning($"{player.Name} hasn't selected a fighter to bet on!");
-            return;
+        foreach (var item in _activeItems) {
+            if (item != null) item.SetFighterNames(f1Name, f2Name);
         }
-
-        int choice = playerChoices[player];
-
-        // Deduct points instantly or lock them for the match
-        _playerManager.AddPlayerPoint(player, -finalizedBet);
-
-        Debug.Log($"{player.Name} gambled {finalizedBet} points on Fighter {choice}!");
-
-        // Refresh the list UI to show updated available points
-        UpdateBetterList();
     }
-
-    #endregion
 
     void SafelyDestroyAllItems() {
         if (BettingScrollViewContent == null) return;

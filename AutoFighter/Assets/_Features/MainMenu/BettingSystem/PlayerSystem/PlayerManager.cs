@@ -2,13 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour {
+public class PlayerManager : Singleton<PlayerManager> {
 
     public List<Player> PlayerList = new List<Player>();
-
-    void Start() {
-        DontDestroyOnLoad(gameObject);
-    }
 
     public Player AddNewPlayer() {
         Player player = new Player();
@@ -24,6 +20,7 @@ public class PlayerManager : MonoBehaviour {
 
     public void AddPlayerPoint(Player player, int pointNumber) {
         player.Points = player.Points + pointNumber;
+        if(player.Points <= 0) player.Points = 1;
     }
 
     public void AddPlayerWin(Player player) {
