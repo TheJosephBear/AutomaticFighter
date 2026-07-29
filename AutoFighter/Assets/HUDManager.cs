@@ -21,6 +21,10 @@ public class HUDManager : MonoBehaviour {
     private float _maxMana2 = 1f;
 
 
+    public void ToggleUI(bool toogleOn) {
+        gameObject.SetActive(toogleOn);
+    }
+
 
     /// <summary>
     /// Initializes Fighter 1 UI with names and starting stats.

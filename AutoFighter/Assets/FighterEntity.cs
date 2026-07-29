@@ -12,6 +12,7 @@ public class FighterEntity : MonoBehaviour {
     #region References
 
     public FighterEntity Enemy;
+    public GameObject BloodSplatVFX;
 
     Rigidbody _rb;
 
@@ -81,6 +82,8 @@ public class FighterEntity : MonoBehaviour {
 
         HandleRegeneration();
         HandleEffects();
+
+        if(Enemy == null) return;
 
         // Keep looking at him all the time just to be sure
         if(CurrentDecision != FighterDecision.RunAway) _movement.LookAt(Enemy.transform.position);
@@ -287,11 +290,18 @@ public class FighterEntity : MonoBehaviour {
         _rb.isKinematic = true;
 
         OnDeath?.Invoke();
+        Instantiate(BloodSplatVFX, transform);
+        Destroy(this.gameObject);
     }
 
     #endregion
 
     #region Effects
+
+    public void DanceTime() {
+        GetComponent<AnimationManager>().ShutOffAllStates();
+        GetComponent<AnimationManager>().FireTrigger("dance");
+    }
 
     public void ApplyEffect(ActiveEffect effect) {
 

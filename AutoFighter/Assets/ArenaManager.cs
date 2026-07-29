@@ -21,6 +21,8 @@ public class ArenaManager : MonoBehaviour {
     ArenaManager _arenaManager;
     BettingManager _bettingManager;
     HUDManager _hudManager;
+    FighterEntity _figherEntityScript1 = null;
+    FighterEntity _figherEntityScript2 = null;
 
     private Coroutine _cameraSwitchCoroutine;
     private bool _isFightActive = false;
@@ -33,17 +35,34 @@ public class ArenaManager : MonoBehaviour {
         _arenaManager = FindAnyObjectByType<ArenaManager>();
         _bettingManager = FindAnyObjectByType<BettingManager>();
         _hudManager = FindAnyObjectByType<HUDManager>();
+        CutsceneManager cutsceneman = FindAnyObjectByType<CutsceneManager>();
 
         SpawnFighters();
-        InitializeHUD();
         GameOverUI.SetActive(false);
+        _hudManager.ToggleUI(false);
+        SpectatorVcamReference.LookAt = _figherEntityScript1.gameObject.transform;
+
+        cutsceneman.IntroductionScene(_figherEntityScript1.transform, _figherEntityScript2.transform, () => {
+            _hudManager.ToggleUI(true);
+            InitializeHUD();
+            StartCoroutine(DelayStartCoroutine());
+        });
+    }
+
+    IEnumerator DelayStartCoroutine() {
+        yield return new WaitForSeconds(2f);
+        StartFight();
+    }
+
+    void StartFight() {
+        _figherEntityScript1.Enemy = _figherEntityScript2;
+        _figherEntityScript2.Enemy = _figherEntityScript1;
+        StartCameraSwitching(_figherEntityScript1.transform, _figherEntityScript2.transform);
     }
 
     private void SpawnFighters() {
         Character c1 = CharacterManager.Instance.SelectedCharacter1;
         Character c2 = CharacterManager.Instance.SelectedCharacter2;
-        FighterEntity figherEntityScript1 = null;
-        FighterEntity figherEntityScript2 = null;
 
         // Get the matching prefabs from CharacterManager's CharacterPrefabList
         if (c1 != null) {
@@ -53,15 +72,15 @@ public class ArenaManager : MonoBehaviour {
                 Quaternion spawnRot = SpawnPoint1 != null ? SpawnPoint1.rotation : Quaternion.identity;
                 Fighter1 = Instantiate(prefab1, spawnPos, spawnRot);
 
-                figherEntityScript1 = Fighter1.GetComponent<FighterEntity>();
-                figherEntityScript1.HP.BaseValue = c1.HP;
-                figherEntityScript1.HP.CurrentValue = c1.HP;
-                figherEntityScript1.Damage.BaseValue = c1.DMG;
-                figherEntityScript1.Damage.CurrentValue = c1.DMG;
-                figherEntityScript1.AttackSpeed.BaseValue = c1.AS;
-                figherEntityScript1.AttackSpeed.CurrentValue = c1.AS;
-                figherEntityScript1.MoveSpeed.BaseValue = c1.MS;
-                figherEntityScript1.MoveSpeed.CurrentValue = c1.MS;
+                _figherEntityScript1 = Fighter1.GetComponent<FighterEntity>();
+                _figherEntityScript1.HP.BaseValue = c1.HP;
+                _figherEntityScript1.HP.CurrentValue = c1.HP;
+                _figherEntityScript1.Damage.BaseValue = c1.DMG;
+                _figherEntityScript1.Damage.CurrentValue = c1.DMG;
+                _figherEntityScript1.AttackSpeed.BaseValue = c1.AS;
+                _figherEntityScript1.AttackSpeed.CurrentValue = c1.AS;
+                _figherEntityScript1.MoveSpeed.BaseValue = c1.MS;
+                _figherEntityScript1.MoveSpeed.CurrentValue = c1.MS;
             }
         }
 
@@ -72,37 +91,35 @@ public class ArenaManager : MonoBehaviour {
                 Quaternion spawnRot = SpawnPoint2 != null ? SpawnPoint2.rotation : Quaternion.identity;
                 Fighter2 = Instantiate(prefab2, spawnPos, spawnRot);
 
-                figherEntityScript2 = Fighter2.GetComponent<FighterEntity>();
-                figherEntityScript2.HP.BaseValue = c2.HP;
-                figherEntityScript2.HP.CurrentValue = c2.HP;
-                figherEntityScript2.Damage.BaseValue = c2.DMG;
-                figherEntityScript2.Damage.CurrentValue = c2.DMG;
-                figherEntityScript2.AttackSpeed.BaseValue = c2.AS;
-                figherEntityScript2.AttackSpeed.CurrentValue = c2.AS;
-                figherEntityScript2.MoveSpeed.BaseValue = c2.MS;
-                figherEntityScript2.MoveSpeed.CurrentValue = c2.MS;
+                _figherEntityScript2 = Fighter2.GetComponent<FighterEntity>();
+                _figherEntityScript2.HP.BaseValue = c2.HP;
+                _figherEntityScript2.HP.CurrentValue = c2.HP;
+                _figherEntityScript2.Damage.BaseValue = c2.DMG;
+                _figherEntityScript2.Damage.CurrentValue = c2.DMG;
+                _figherEntityScript2.AttackSpeed.BaseValue = c2.AS;
+                _figherEntityScript2.AttackSpeed.CurrentValue = c2.AS;
+                _figherEntityScript2.MoveSpeed.BaseValue = c2.MS;
+                _figherEntityScript2.MoveSpeed.CurrentValue = c2.MS;
             }
         }
 
-        if (figherEntityScript1 != null && figherEntityScript2 != null) {
-            figherEntityScript1.Enemy = figherEntityScript2;
-            figherEntityScript2.Enemy = figherEntityScript1;
-            StartCameraSwitching(figherEntityScript1.transform, figherEntityScript2.transform);
+        if (_figherEntityScript1 != null && _figherEntityScript2 != null) {
+        //    _figherEntityScript1.Enemy = _figherEntityScript2;
+         //   _figherEntityScript2.Enemy = _figherEntityScript1;
 
-            figherEntityScript1.OnHPChange += _hudManager.UpdateHP1;
-            figherEntityScript1.OnHit += () => {  
-                    figherEntityScript2.Mana.CurrentValue += 10;          
+            _figherEntityScript1.OnHPChange += _hudManager.UpdateHP1;
+            _figherEntityScript1.OnHit += () => {  
+                    _figherEntityScript2.Mana.CurrentValue += 10;          
             };
-            figherEntityScript2.OnHit += () => {
-                    figherEntityScript1.Mana.CurrentValue += 10;       
+            _figherEntityScript2.OnHit += () => {
+                    _figherEntityScript1.Mana.CurrentValue += 10;       
             };
-            figherEntityScript2.OnHPChange += _hudManager.UpdateHP2;
-            figherEntityScript1.OnManaChange += _hudManager.UpdateMana1;
-            figherEntityScript2.OnManaChange += _hudManager.UpdateMana2;
-            figherEntityScript1.OnDeath += () => OnFightOver(c1);
-            figherEntityScript2.OnDeath += () => OnFightOver(c2);
+            _figherEntityScript2.OnHPChange += _hudManager.UpdateHP2;
+            _figherEntityScript1.OnManaChange += _hudManager.UpdateMana1;
+            _figherEntityScript2.OnManaChange += _hudManager.UpdateMana2;
+            _figherEntityScript1.OnDeath += () => OnFightOver(c1, _figherEntityScript2);
+            _figherEntityScript2.OnDeath += () => OnFightOver(c2, _figherEntityScript1);
         }
-
     }
 
     public void StartCameraSwitching(Transform fighter1, Transform fighter2) {
@@ -125,7 +142,7 @@ public class ArenaManager : MonoBehaviour {
             SpectatorVcamReference.Follow = currentTarget;
 
             // Wait for a random duration
-            yield return new WaitForSeconds(Random.Range(1f, 3f));
+            yield return new WaitForSeconds(Random.Range(3f, 5f));
 
             // Alternate target
             currentTarget = (currentTarget == lookAtOne) ? lookAtTwo : lookAtOne;
@@ -157,7 +174,7 @@ public class ArenaManager : MonoBehaviour {
         return null;
     }
 
-    public void OnFightOver(Character defeatedCharacter) {
+    public void OnFightOver(Character defeatedCharacter, FighterEntity winnerCharacter) {
         if (!_isFightActive) return; // Prevents double-firing if both die on the same frame
         _isFightActive = false;
 
@@ -180,12 +197,16 @@ public class ArenaManager : MonoBehaviour {
         // Resolve bets, increment win counters, and distribute points
         ResolveMatchResults(winningFighterIndex);
 
-        Debug.Log($"Fight over! Winner is Fighter {winningFighterIndex}. Spectator camera stopped.");
-
-        Time.timeScale = 0f;
-        if (GameOverUI != null) {
-            GameOverUI.SetActive(true);
-        }
+        CutsceneManager cutsceneman = FindAnyObjectByType<CutsceneManager>();
+        winnerCharacter.Enemy = null;
+        winnerCharacter.GetComponent<FighterAI>().enabled = false;
+        winnerCharacter.enabled = false;
+        cutsceneman.WinScene(winnerCharacter.gameObject , () => {
+            Time.timeScale = 0f;
+            if (GameOverUI != null) {
+                GameOverUI.SetActive(true);
+            }
+        });
     }
 
     private void ResolveMatchResults(int winningFighterIndex) {

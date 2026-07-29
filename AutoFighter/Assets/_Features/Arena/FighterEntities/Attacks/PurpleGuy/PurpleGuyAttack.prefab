@@ -48,7 +48,7 @@ MonoBehaviour:
   KnockbackStrength: 5
   AttackDuration: 0.1
   PurpleGuyLifeTime: 5
-  PurpleGuyDamage: 1
+  PurpleGuyDamage: 5
   PurpleGuyAttackSpeed: 0.2
   PurpleGuyMovementSpeed: 30
   PurpleGuyEntityPrefab: {fileID: 6268408167473118457, guid: a223a762a2f25a748a28a4f9ee353cd7, type: 3}

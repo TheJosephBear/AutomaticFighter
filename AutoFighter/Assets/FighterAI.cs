@@ -68,6 +68,10 @@ public class FighterAI : MonoBehaviour {
         if (_entity.IsDead)
             return;
 
+        if(_entity.Enemy == null) 
+            return;
+        
+
         HandleDecision();
     }
 

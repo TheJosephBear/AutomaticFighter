@@ -84,6 +84,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Enemy: {fileID: 0}
+  BloodSplatVFX: {fileID: 3523310633488625748, guid: f78a9360378355c45a4c56b4c4a2948c, type: 3}
   HP:
     _baseValue: 100
     _currentValue: 0.1

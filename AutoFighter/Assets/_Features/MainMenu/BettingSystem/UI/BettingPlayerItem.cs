@@ -44,6 +44,7 @@ public class BettingPlayerItem : MonoBehaviour {
 
         UpdateItemText();
         UpdateSelectionVisuals();
+        BettingManager.Instance.RegisterPendingBet(_player, _selectedFighter, 1);
     }
 
     public void SetFighterNames(string fighter1Name, string fighter2Name) {

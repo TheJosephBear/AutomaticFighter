@@ -132,7 +132,7 @@ public class AnimationManager : MonoBehaviour {
         return _entity.HasEffect(effect);
     }
 
-    void ShutOffAllStates() {
+    public void ShutOffAllStates() {
 
         SetBool("Attack", false);
         SetBool("Special", false);
@@ -167,6 +167,9 @@ public class AnimationManager : MonoBehaviour {
                 break;
             case "defend":
                 Animator.SetTrigger("Defend");
+                break;
+            case "dance":
+                Animator.SetTrigger("dance");
                 break;
         }
     }

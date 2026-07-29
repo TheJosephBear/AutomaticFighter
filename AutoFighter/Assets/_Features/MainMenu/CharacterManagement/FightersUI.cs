@@ -157,14 +157,14 @@ public class FightersUI : MonoBehaviour {
     public void OnCharacterHPAdd() {
         if (ActivelyEditedCharacter.SkillPoints <= 0) return;
 
-        ActivelyEditedCharacter.HP += 10;
+        ActivelyEditedCharacter.HP += 50;
         ActivelyEditedCharacter.SkillPoints--;
         UpdateStatLabels();
     }
 
     public void OnCharacterHPDecrease() {
-        if (ActivelyEditedCharacter.HP > 10) {
-            ActivelyEditedCharacter.HP -= 10;
+        if (ActivelyEditedCharacter.HP > 50) {
+            ActivelyEditedCharacter.HP -= 50;
             ActivelyEditedCharacter.SkillPoints++;
             UpdateStatLabels();
         }
@@ -174,14 +174,14 @@ public class FightersUI : MonoBehaviour {
     public void OnCharacterDMGAdd() {
         if (ActivelyEditedCharacter.SkillPoints <= 0) return;
 
-        ActivelyEditedCharacter.DMG += 5;
+        ActivelyEditedCharacter.DMG += 2;
         ActivelyEditedCharacter.SkillPoints--;
         UpdateStatLabels();
     }
 
     public void OnCharacterDMGDecrease() {
         if (ActivelyEditedCharacter.DMG > 5) {
-            ActivelyEditedCharacter.DMG -= 5;
+            ActivelyEditedCharacter.DMG -= 2;
             ActivelyEditedCharacter.SkillPoints++;
             UpdateStatLabels();
         }

@@ -24,6 +24,7 @@ public class BettingUI : MonoBehaviour {
 
     IEnumerator InitCoroutine() {
         yield return new WaitForSeconds(0.2f);
+        UpdateBettingView();
     }
 
     public void UpdateBettingView() {
