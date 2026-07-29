@@ -27,10 +27,20 @@ public class BettingPlayerItem : MonoBehaviour {
         NameLabel.text = _player.Name;
         TotalPointsLabel.text = $"Majitel {_player.Points} piv";
 
-        // Fetch existing bet state
-        Bet existingBet = BettingManager.Instance.GetPlayerBet(_player);
-        _selectedFighter = existingBet.Choice;
-        _currentBet = Mathf.Clamp(existingBet.Amount, 1, Mathf.Max(1, _player.Points));
+        // Safely retrieve existing bet or fallback to default (Fighter 1, 1 Point)
+        int choice = 1;
+        int amount = 1;
+
+        if (BettingManager.Instance != null) {
+            Bet existingBet = BettingManager.Instance.GetPlayerBet(_player);
+            choice = existingBet.Choice;
+            amount = existingBet.Amount;
+        } else {
+            Debug.LogWarning("BettingManager.Instance is null! Using default bet values.");
+        }
+
+        _selectedFighter = choice;
+        _currentBet = Mathf.Clamp(amount, 1, Mathf.Max(1, _player.Points));
 
         UpdateItemText();
         UpdateSelectionVisuals();

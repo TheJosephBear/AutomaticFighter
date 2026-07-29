@@ -1,21 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using TMPro.EditorUtilities;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class FightersUI : MonoBehaviour {
 
     public GameObject CharacterButtonPrefab;
 
-    // UI reffs
+    // UI refs
     public GameObject CharacterEditingView;
     public GameObject CharacterScrollViewContent;
     public RawImage FighterPreview;
     public TMP_InputField InputFieldCharacterName;
+    public TextMeshProUGUI SkillPointsLabel; // Drag your UI Text for Skill Points here in Inspector
     public TextMeshProUGUI HPLabel;
     public TextMeshProUGUI DMGLabel;
     public TextMeshProUGUI ASLabel;
@@ -44,6 +42,7 @@ public class FightersUI : MonoBehaviour {
             AS = 0.8f,
             MS = 10,
             CharacterModel = CharacterModel.Knight,
+            SkillPoints = 5 // Initial skill points to spend
         };
 
         CharacterManager.Instance.AddCharacter(newCharacter);
@@ -57,22 +56,22 @@ public class FightersUI : MonoBehaviour {
     public void OnEditingFinished() {
         CharacterEditingView.SetActive(false);
         UpdateScrollView();
+        CharacterManager.Instance.SaveCharacters();
     }
 
     public void OnRemoveCharacter() {
         CharacterManager.Instance.DeleteCharacter(ActivelyEditedCharacter);
         OnEditingFinished();
+        CharacterManager.Instance.SaveCharacters();
     }
 
     public void OpenCharacterEditing(Character character) {
         ActivelyEditedCharacter = character;
         CharacterEditingView.SetActive(true);
+
         // Fill in data
         InputFieldCharacterName.text = character.Name;
-        HPLabel.text = character.HP.ToString();
-        DMGLabel.text = character.DMG.ToString();
-        ASLabel.text = character.AS.ToString();
-        MSLabel.text = character.MS.ToString();
+        UpdateStatLabels();
 
         // Preview
         FighterPreview.texture = _previewManager.GetObjectPreviewTexture(((int)character.CharacterModel));
@@ -91,7 +90,6 @@ public class FightersUI : MonoBehaviour {
         }
 
         CharacterModelDropdown.ClearOptions();
-
         CharacterModelDropdown.options = newOptions;
     }
 
@@ -114,27 +112,34 @@ public class FightersUI : MonoBehaviour {
         RectTransform contentRef = CharacterScrollViewContent.GetComponent<RectTransform>();
         ScrollRect scrollRect = contentRef.GetComponent<ScrollRect>();
 
-        // 1. Loop backwards to safely destroy all children
         for (int i = contentRef.childCount - 1; i >= 0; i--) {
             GameObject child = contentRef.GetChild(i).gameObject;
-
-            // Safety check to ensure we aren't destroying something already dead
             if (child != null) {
                 Object.Destroy(child);
             }
         }
 
-        // 2. Reset the scroll position to the top of the view
         if (scrollRect != null) {
             scrollRect.verticalNormalizedPosition = 1f;
         }
 
-        // 3. Force Unity's UI system to instantly recalculate the sizes
         Canvas.ForceUpdateCanvases();
 
         if (contentRef.TryGetComponent<HorizontalOrVerticalLayoutGroup>(out var layoutGroup)) {
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRef);
         }
+    }
+
+    private void UpdateStatLabels() {
+        if (ActivelyEditedCharacter == null) return;
+
+        if (SkillPointsLabel != null) {
+            SkillPointsLabel.text = $"{ActivelyEditedCharacter.SkillPoints}";
+        }
+        HPLabel.text = ActivelyEditedCharacter.HP.ToString();
+        DMGLabel.text = ActivelyEditedCharacter.DMG.ToString();
+        ASLabel.text = ActivelyEditedCharacter.AS.ToString("F1");
+        MSLabel.text = ActivelyEditedCharacter.MS.ToString();
     }
 
     #region Editing OnClicks
@@ -148,46 +153,73 @@ public class FightersUI : MonoBehaviour {
         ActivelyEditedCharacter.Name = name;
     }
 
+    // --- HP ---
     public void OnCharacterHPAdd() {
-        ActivelyEditedCharacter.HP++;
-        HPLabel.text = ActivelyEditedCharacter.HP.ToString();
+        if (ActivelyEditedCharacter.SkillPoints <= 0) return;
+
+        ActivelyEditedCharacter.HP += 10;
+        ActivelyEditedCharacter.SkillPoints--;
+        UpdateStatLabels();
     }
 
     public void OnCharacterHPDecrease() {
-        ActivelyEditedCharacter.HP--;
-        HPLabel.text = ActivelyEditedCharacter.HP.ToString();
+        if (ActivelyEditedCharacter.HP > 10) {
+            ActivelyEditedCharacter.HP -= 10;
+            ActivelyEditedCharacter.SkillPoints++;
+            UpdateStatLabels();
+        }
     }
 
+    // --- DMG ---
     public void OnCharacterDMGAdd() {
-        ActivelyEditedCharacter.DMG++;
-        DMGLabel.text = ActivelyEditedCharacter.DMG.ToString();
+        if (ActivelyEditedCharacter.SkillPoints <= 0) return;
+
+        ActivelyEditedCharacter.DMG += 5;
+        ActivelyEditedCharacter.SkillPoints--;
+        UpdateStatLabels();
     }
 
     public void OnCharacterDMGDecrease() {
-        ActivelyEditedCharacter.DMG--;
-        DMGLabel.text = ActivelyEditedCharacter.DMG.ToString();
+        if (ActivelyEditedCharacter.DMG > 5) {
+            ActivelyEditedCharacter.DMG -= 5;
+            ActivelyEditedCharacter.SkillPoints++;
+            UpdateStatLabels();
+        }
     }
 
+    // --- Attack Speed (AS) - Smaller value means faster attack speed ---
     public void OnCharacterASAdd() {
-        ActivelyEditedCharacter.AS++;
-        ASLabel.text = ActivelyEditedCharacter.AS.ToString();
+        if (ActivelyEditedCharacter.SkillPoints <= 0 || ActivelyEditedCharacter.AS <= 0.1f) return;
+
+        ActivelyEditedCharacter.AS -= 0.1f; // Decreasing delay costs 1 point
+        ActivelyEditedCharacter.SkillPoints--;
+        UpdateStatLabels();
     }
 
     public void OnCharacterASDecrease() {
-        ActivelyEditedCharacter.AS--;
-        ASLabel.text = ActivelyEditedCharacter.AS.ToString();
+        if (ActivelyEditedCharacter.AS < 1.5f) {
+            ActivelyEditedCharacter.AS += 0.1f; // Increasing delay refunds 1 point
+            ActivelyEditedCharacter.SkillPoints++;
+            UpdateStatLabels();
+        }
     }
 
+    // --- Movement Speed (MS) ---
     public void OnCharacterMSAdd() {
+        if (ActivelyEditedCharacter.SkillPoints <= 0) return;
+
         ActivelyEditedCharacter.MS++;
-        MSLabel.text = ActivelyEditedCharacter.MS.ToString();
+        ActivelyEditedCharacter.SkillPoints--;
+        UpdateStatLabels();
     }
 
     public void OnCharacterMSDecrease() {
-        ActivelyEditedCharacter.MS--;
-        MSLabel.text = ActivelyEditedCharacter.MS.ToString();
+        if (ActivelyEditedCharacter.MS > 2) {
+            ActivelyEditedCharacter.MS--;
+            ActivelyEditedCharacter.SkillPoints++;
+            UpdateStatLabels();
+        }
     }
 
     #endregion
-
 }

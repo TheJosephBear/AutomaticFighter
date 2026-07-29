@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,26 @@ public class LeaderboardUI : MonoBehaviour {
 
     List<LeaderboardItem> _itemList = new List<LeaderboardItem>();
 
-    void Awake() {
-        
+    void OnEnable() {
+        // Automatically refresh whenever the Leaderboard UI is enabled/shown
+        UpdateLeaderboard();
+    }
+
+    public void UpdateLeaderboard() {
+        SafelyDestroyAllItems();
+
+        if (PlayerManager.Instance == null || PlayerManager.Instance.PlayerList == null) return;
+
+        // 1. Order players descending by Points (and by WinCount as a tiebreaker)
+        List<Player> sortedPlayers = PlayerManager.Instance.PlayerList
+            .OrderBy(p => p.Points)
+            .ToList();
+
+        // 2. Add sorted items to UI with 1-based rank position
+        for (int i = 0; i < sortedPlayers.Count; i++) {
+            Player p = sortedPlayers[i];
+            AddItem(p.Name, i + 1, p.Points);
+        }
     }
 
     public void AddItem(string name, int order, int points) {
